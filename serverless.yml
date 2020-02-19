@@ -1,0 +1,134 @@
+service: onicatakehometest
+
+provider:
+  name: aws
+  runtime: python3.8
+  stage: dev
+
+
+package:
+  exclude:
+    - venv/**
+    - test*
+    - node_modules/**
+    - formations/**
+    - package*
+
+  include:
+    - src/**
+
+functionEnvironmentVariables: &default_environment_variables
+  DYNAMODB_TABLE_NAME: !Ref DynamoDBTable
+
+functions:
+  onicaLambdaGetUsersList:
+    handler: src/handler.get_user_list_handler
+    events:
+      - http:
+          path: /id
+          method: get
+    environment:
+      <<: *default_environment_variables
+
+  onicaLambdaGetUserDetails:
+    handler: src/handler.get_user_handler
+    events:
+      - http:
+          path: /id/{id}
+          method: get
+    environment:
+      <<: *default_environment_variables
+
+
+resources:
+  Resources:
+    DynamoDBTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+
+    ApiGatewayDeployment:
+      Type: AWS::ApiGateway::Deployment
+      DependsOn:
+        - ApiGatewayMethodIdGet
+        - ApiGatewayMethodIdIdVarGet
+      Properties:
+        RestApiId: !Ref ApiGatewayRestApi
+        StageName: dev
+
+    ApiGatewayStageProd:
+      Type: AWS::ApiGateway::Stage
+      Properties:
+        DeploymentId: !Ref ApiGatewayDeployment
+        RestApiId: !Ref ApiGatewayRestApi
+        StageName: prod
+
+    OnicaLambdaGetUsersListLogGroup:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        LogGroupName: "/aws/lambda/onicatakehometest-dev-onicaLambdaGetUsersList"
+        RetentionInDays: 30
+
+    OnicaLambdaGetUserDetailsLogGroup:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        LogGroupName: "/aws/lambda/onicatakehometest-dev-onicaLambdaGetUserDetails"
+        RetentionInDays: 30
+
+
+    IamRoleLambdaExecution:
+      Type: AWS::IAM::Role
+      Properties:
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - lambda.amazonaws.com
+              Action:
+                - sts:AssumeRole
+        Policies:
+          - PolicyName:
+              Fn::Join:
+                - "-"
+                - - dev
+                  - onicatakehometest
+                  - lambda
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - logs:CreateLogStream
+                    - logs:CreateLogGroup
+                  Resource:
+                    - Fn::Sub: arn:aws:logs:#{AWS::Region}:#{AWS::AccountId}:log-group:/aws/lambda/onicatakehometest-dev*:*
+                - Effect: Allow
+                  Action:
+                    - logs:PutLogEvents
+                  Resource:
+                    - Fn::Sub: arn:aws:logs:#{AWS::Region}:#{AWS::AccountId}:log-group:/aws/lambda/onicatakehometest-dev*:*:*
+                - Effect: Allow
+                  Action:
+                    - dynamodb:*
+                  Resource:
+                    - Fn::GetAtt: DynamoDBTable.Arn
+        Path: "/"
+        RoleName:
+          Fn::Join:
+            - "-"
+            - - onicatakehometest
+              - dev
+              - Ref: AWS::Region
+              - lambdaRole
+
+plugins:
+  - serverless-python-requirements
+  - serverless-pseudo-parameters

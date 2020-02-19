@@ -26,5 +26,6 @@ Outputs:
       Since no name was provided to the DynamoDB table resource, AWS will choose a
       random name for it, so we need to export that.
     Export:
-      Name: DynamoDBTableName
+      Name: PeterOnicaTestDynamoDBTableName
+
 
