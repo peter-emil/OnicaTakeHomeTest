@@ -117,7 +117,9 @@ resources:
                     - Fn::Sub: arn:aws:logs:#{AWS::Region}:#{AWS::AccountId}:log-group:/aws/lambda/onicatakehometest-dev*:*:*
                 - Effect: Allow
                   Action:
-                    - dynamodb:*
+                    - dynamodb:DescribeTable
+                    - dynamodb:Scan
+                    - dynamodb:GetItem
                   Resource:
                     - Fn::GetAtt: DynamoDBTable.Arn
         Path: "/"
