@@ -35,4 +35,5 @@ The deliverables as well as requirements. assumptions, tradeoffs, .. etc. are do
  - Define more custom exceptions to handle different business logic cases, move things like `UserId` and `Name` to another file containing value objects because I just placed them the `entities.py` file for now while they are in fact, value objects.
  - Add a CI/CD pipeline to automate the process of testing the code, integrating with dependencies, and faster deployment.
  - I would have added pagination using limit-offset style.
- - I would added and configured a linter, style guide checker, and a static type checker and made them part of the CI/CD pipeline.
+ - I would have added and configured a linter, style guide checker, and a static type checker and made them part of the CI/CD pipeline.
+ - I would have added a swagger file and based the API configuration off it; This would be useful because it would mean that API docs would never go out of date as the API gateway would be based off of them.
