@@ -29,8 +29,10 @@ The deliverables as well as requirements. assumptions, tradeoffs, .. etc. are do
  7. Install serverless plugins by typing `npm install`.
  8. Authenticate `serverless` with your AWS account. Many methods for accomplishing this can be found [here](https://serverless.com/framework/docs/providers/aws/guide/credentials/).
 
-# Things I Would Change In Production
+# Things I Would Have Changed In A Real Project
 
  - Write tests, tests, and more tests. For the most part, it makes sense here to set using the `doctest` module. It's easy, simple, and gets the job done.
  - Define more custom exceptions to handle different business logic cases, move things like `UserId` and `Name` to another file containing value objects because I just placed them the `entities.py` file for now while they are in fact, value objects.
  - Add a CI/CD pipeline to automate the process of testing the code, integrating with dependencies, and faster deployment.
+ - I would have added pagination using limit-offset style.
+ - I would added and configured a linter, style guide checker, and a static type checker and made them part of the CI/CD pipeline.

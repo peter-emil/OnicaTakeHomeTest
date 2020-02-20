@@ -6,7 +6,7 @@ from src.app import entities
 
 
 class UserRepository(abc.ABC):
-    def get_user_list(self) -> typing.List[entities.UserId]:  # I am pretending pagination doesn't exist
+    def get_user_list(self) -> typing.List[entities.UserId]:  # TODO: I am pretending pagination doesn't exist
         pass
 
     def get_user(self, user_id: entities.UserId) -> entities.User:
